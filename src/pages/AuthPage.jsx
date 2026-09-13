@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 export default function AuthPage() {
   const loginImage = "https://sig1.co/img-twitter-1";
   const url =
-    "https://auth-back-end-sigmaschooltech.sigma-school-full-stack.repl.co";
+    "http://localhost:3000";
 
   // Possible values: null (no modal shows), "Login", "SignUp"
   const [modalShow, setModalShow] = useState(null);
