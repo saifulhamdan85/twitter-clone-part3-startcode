@@ -1,28 +1,25 @@
-import { Button, Col, Image, Nav, Row } from "react-bootstrap";
+import { Button, Col, Image, Nav, Row, Spinner } from "react-bootstrap";
 import ProfilePostCard from "./ProfilePostCard";
 import { jwtDecode } from "jwt-decode";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { usePosts } from "../contexts/PostContext";
 
 export default function ProfileMidBody() {
-    const [posts, setPosts] = useState([]);
     const url = "https://pbs.twimg.com/profile_banners/83072625/1602845571/1500x500";
     const pic = "https://pbs.twimg.com/profile_images/1587405892437221376/h167Jlb2_400x400.jpg";
 
-    // Fetch posts based on user ID
-    const fetchPosts = (userId) => {
-        fetch(`http://localhost:3000/posts/user/${userId}`)
-            .then((response) => response.json())
-            .then((data) => setPosts(data))
-            .catch((error) => console.error("Error:", error));
-    };
+    const { posts, loading, fetchPostByUser } = usePosts();
 
     useEffect(() => {
-        const token = localStorage.getItem("authToken");
-        if (token) {
-            const decodedToken = jwtDecode(token);
-            const userId = decodedToken.id;
-            fetchPosts(userId);
-        }
+        const fetchPost = async () => {
+            const token = localStorage.getItem("authToken");
+            if (token) {
+                const decodedToken = jwtDecode(token);
+                const userId = decodedToken.id;
+                await fetchPostByUser(userId);
+            }
+        };
+        fetchPost();
     }, []);
 
     return (
@@ -80,6 +77,9 @@ export default function ProfileMidBody() {
                     <Nav.Link eventKey="/link-4">Likes</Nav.Link>
                 </Nav.Item>
             </Nav>
+            {loading && (
+                <Spinner animation="border" className="ms-3 mt-3" variant="primary" />
+            )}
             {posts.length > 0 && posts.map((post) => (
                 <ProfilePostCard key={post.id} content={post.content} postId={post.id} />
             ))}

@@ -1,36 +1,17 @@
-import axios from "axios";
 import { useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
-import { jwtDecode } from "jwt-decode";
+import { usePosts } from "../contexts/PostContext";
 
 export default function NewPostModal({ show, handleClose }) {
     const [postContent, setPostContent] = useState("");
 
-    const handleSave = () => {
-        // Get stored JWT token
-        const token = localStorage.getItem("authToken");
+    const { savePost } = usePosts();
 
-        // Decode the token to fetch user Id
-        const decode = jwtDecode(token);
-        const userId = decode.id // May change depending on how the server encode the token
+    const handleSave = async () => {
+        await savePost(postContent);
 
-        // Prepare data to be sent
-        const data = {
-            title: "Post title", // Add functionality to set this properly
-            content: postContent,
-            user_id: userId,
-        };
-
-        // Make your API call here
-        axios
-            .post("http://localhost:3000/posts", data)
-            .then((response) => {
-                console.log("Success", response.data);
-                handleClose();
-            })
-            .catch((error) => {
-                console.error("Error:", error)
-            });
+        handleClose();
+        setPostContent("");
     };
 
     return (
